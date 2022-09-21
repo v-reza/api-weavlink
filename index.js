@@ -116,20 +116,20 @@ app.get("/api/checkToken", verifyBearerToken, (req, res) => {
 const port = process.env.PORT || 1000;
 
 // socket
-const expressServer = express()
-const server = http.createServer(expressServer)
-const io = new Server(server, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
-  }
-});
-io.on("connection", (socket) => {
-  console.log("a user connected");
-  socket.on("disconnect", () => {
-    console.log("user disconnected");
-  });
-})
+// const expressServer = express()
+// const server = http.createServer(expressServer)
+// const io = new Server(server, {
+//   cors: {
+//     origin: "*",
+//     methods: ["GET", "POST"]
+//   }
+// });
+// io.on("connection", (socket) => {
+//   console.log("a user connected");
+//   socket.on("disconnect", () => {
+//     console.log("user disconnected");
+//   });
+// })
 
 app.get("/", (req, res) => {
   res.send("👋 WeavLink API Running 👋 to https://weavlink.works");

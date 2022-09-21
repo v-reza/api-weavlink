@@ -65,13 +65,13 @@ router.delete("/delete/:id", verifyBearerToken, async (req, res) => {
       _id: req.params.id,
       userId: req.user.users._id,
     });
-    post.images.length > 0 && post.images.map((file) => {
-      fs.unlink(`public/assets/${file}`, (err) => {
-        if (err) {
-          return res.status(500).json(err);
-        }
-      });
-    });
+    // post.images.length > 0 && post.images.map((file) => {
+    //   fs.unlink(`public/assets/${file}`, (err) => {
+    //     if (err) {
+    //       return res.status(500).json(err);
+    //     }
+    //   });
+    // });
     post.comments.map(async (comment) => {
       await Comment.deleteOne({ _id: comment });
     });
