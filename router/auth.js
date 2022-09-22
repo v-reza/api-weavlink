@@ -36,11 +36,11 @@ router.post("/register", async (req, res) => {
     });
     await experience.save();
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_TOKEN, {
+    const { password, ...userDocs } = user._doc;
+    const token = jwt.sign({ users: userDocs }, process.env.JWT_TOKEN, {
       expiresIn: "2h",
     });
 
-    const { password, ...userDocs } = user._doc;
     const updateUsername = await User.findById(user._id);
     await updateUsername.updateOne({
       username: (

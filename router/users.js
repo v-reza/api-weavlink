@@ -4,6 +4,10 @@ const User = require("../models/User");
 const Company = require("../models/Company");
 const mongoose = require("mongoose");
 const UserProfile = require("../models/UserProfile");
+const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
+const fs = require("fs");
+dotenv.config();
 
 router.get("/", async (req, res) => {
   try {
@@ -40,7 +44,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/search/userSearch", async(req, res) => {
+router.get("/search/userSearch", async (req, res) => {
   try {
     const users = await User.find().select([
       "-password",
@@ -49,11 +53,11 @@ router.get("/search/userSearch", async(req, res) => {
       "-updatedAt",
       "-email",
     ]);
-    return res.json(users)
+    return res.json(users);
   } catch (error) {
-    return res.status(500).json(error)
+    return res.status(500).json(error);
   }
-})
+});
 
 router.get("/mentions/listUsersMentions", async (req, res) => {
   try {
@@ -111,6 +115,45 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+router.put(
+  "/update/profileInformation",
+  verifyBearerToken,
+  async (req, res) => {
+    try {
+      const user = await User.findById(req.user.users._id);
+      await user.updateOne({ $set: req.body });
+      const checkPicture = user.profilePicture.replace(
+        `${req.protocol}://${req.headers.host}/images/`,
+        ""
+      );
+      if (
+        checkPicture.split(".")[1] === "png" ||
+        checkPicture.split(".")[1] === "jpg" ||
+        checkPicture.split(".")[1] === "jpeg"
+      ) {
+        fs.unlink(`public/assets/${checkPicture}`, (err) => {
+          if (err) {
+            return res.status(500).json(err);
+          }
+        });
+      }
+
+      const updatedUser = await User.findById(req.user.users._id);
+      const { password, ...userDocs } = updatedUser._doc;
+      const token = jwt.sign({ users: userDocs }, process.env.JWT_TOKEN, {
+        expiresIn: "2h",
+      });
+
+      return res.status(200).json({
+        user: userDocs,
+        token: token,
+      });
+    } catch (error) {
+      return res.status(500).json(error);
+    }
+  }
+);
+
 /**
  * Follow User
  */
@@ -118,7 +161,7 @@ router.put("/:id/follow", verifyBearerToken, async (req, res) => {
   if (req.user.users._id !== req.params.id) {
     try {
       const user = await User.findById(req.params.id);
-      console.log(user)
+      console.log(user);
       const currentUser = await User.findById(req.user.users._id);
       if (!user.followers.includes(req.user.users._id)) {
         await user.updateOne({ $push: { followers: req.user.users._id } });
@@ -166,12 +209,6 @@ router.get("/listFriends/notFollow", verifyBearerToken, async (req, res) => {
     //   followers: { $ne: req.user.users._id },
     // }).select(["-password", "-__v", "-createdAt", "-updatedAt", "-email"]);
     const userProfile = await UserProfile.aggregate([
-      // {
-      //   $match: {
-      //     _id: { $ne: req.user.users._id },
-      //     followers: { $ne: req.user.users._id },
-      //   },
-      // },
       {
         $match: {
           userId: { $ne: req.user.users._id },
