@@ -7,6 +7,7 @@ const UserProfile = require("../models/UserProfile");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 const fs = require("fs");
+const path = require("path");
 dotenv.config();
 
 router.get("/", async (req, res) => {
@@ -122,21 +123,6 @@ router.put(
     try {
       const user = await User.findById(req.user.users._id);
       await user.updateOne({ $set: req.body });
-      const checkPicture = user.profilePicture.replace(
-        `${req.protocol}://${req.headers.host}/images/`,
-        ""
-      );
-      if (
-        checkPicture.split(".")[1] === "png" ||
-        checkPicture.split(".")[1] === "jpg" ||
-        checkPicture.split(".")[1] === "jpeg"
-      ) {
-        fs.unlink(`public/assets/${checkPicture}`, (err) => {
-          if (err) {
-            return res.status(500).json(err);
-          }
-        });
-      }
 
       const updatedUser = await User.findById(req.user.users._id);
       const { password, ...userDocs } = updatedUser._doc;

@@ -8,8 +8,10 @@ const morgan = require("morgan");
 const multer = require("multer");
 const dotenv = require("dotenv");
 const path = require("path");
+const cron = require("node-cron");
 const request = require("request");
-const { Server } = require("socket.io")
+const { Server } = require("socket.io");
+const fs = require("fs");
 
 /* Load Router  */
 const authRouter = require("./router/auth");
@@ -25,34 +27,11 @@ const educationsRouter = require("./router/educations");
 const conversationsRouter = require("./router/conversations");
 const messagesRouter = require("./router/messages");
 const notificationsRouter = require("./router/notifications");
+const cronJobs = require("./cron");
 const verifyBearerToken = require("./helper/verifyBearerToken");
 
 /* Connect Env */
 dotenv.config();
-// const allowCors = fn => async (req, res) => {
-//   res.setHeader('Access-Control-Allow-Credentials', true)
-//   res.setHeader('Access-Control-Allow-Origin', '*')
-//   // another common pattern
-  
-//   // res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
-//   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT')
-//   res.setHeader(
-//     'Access-Control-Allow-Headers',
-//     'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
-//   )
-//   if (req.method === 'OPTIONS') {
-//     res.status(200).end()
-//     return
-//   }
-//   return await fn(req, res)
-// }
-
-// const handler = (req, res) => {
-//   const d = new Date()
-//   res.end(d.toString())
-// }
-
-// app.use(allowCors(handler))
 
 /**
  * Connect MongoDB
@@ -65,7 +44,7 @@ mongoose
 /* App use module */
 app.use(
   cors({
-    origin: "*"
+    origin: "*",
   })
 );
 app.use(morgan("dev"));
@@ -112,24 +91,11 @@ app.get("/api/checkToken", verifyBearerToken, (req, res) => {
   res.status(200).json(req.user);
 });
 
+/* Cron jobs hapus file tidak dipakai */
+cronJobs.scheduled.start()
+
 /* Set Port */
 const port = process.env.PORT || 1000;
-
-// socket
-// const expressServer = express()
-// const server = http.createServer(expressServer)
-// const io = new Server(server, {
-//   cors: {
-//     origin: "*",
-//     methods: ["GET", "POST"]
-//   }
-// });
-// io.on("connection", (socket) => {
-//   console.log("a user connected");
-//   socket.on("disconnect", () => {
-//     console.log("user disconnected");
-//   });
-// })
 
 app.get("/", (req, res) => {
   res.send("👋 WeavLink API Running 👋 to https://weavlink.works");
