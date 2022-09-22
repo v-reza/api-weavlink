@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "pm2 start index.js --watch && pm2 logs",
+    "start": "pm2 start index.js --no-autorestart && pm2 logs",
     "log": "pm2 logs",
     "stop": "pm2 stop index.js",
     "listpm2": "pm2 list",
