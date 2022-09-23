@@ -27,6 +27,7 @@ const educationsRouter = require("./router/educations");
 const conversationsRouter = require("./router/conversations");
 const messagesRouter = require("./router/messages");
 const notificationsRouter = require("./router/notifications");
+const locationsRouter = require("./router/locations");
 const cronJobs = require("./cron");
 const verifyBearerToken = require("./helper/verifyBearerToken");
 
@@ -65,6 +66,7 @@ app.use("/api/educations", educationsRouter);
 app.use("/api/conversations", conversationsRouter);
 app.use("/api/messages", messagesRouter);
 app.use("/api/notifications", notificationsRouter);
+app.use("/api/locations", locationsRouter);
 
 const options = {
   method: "POST",

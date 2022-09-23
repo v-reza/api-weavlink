@@ -1,6 +1,6 @@
-# fly.toml file generated for api-weavlink on 2022-09-21T16:30:36+07:00
+# fly.toml file generated for api-weav on 2022-09-23T14:45:57+07:00
 
-app = "api-weavlink"
+app = "api-weav"
 kill_signal = "SIGINT"
 kill_timeout = 5
 processes = []

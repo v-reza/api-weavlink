@@ -30,6 +30,7 @@ const scheduled = cron.schedule(cronTime, async () => {
     if (!googlePicture) {
       const profilePicture = usr.profilePicture.replace(
         "https://api-weavlink.fly.dev/images/",
+        // "http://localhost:1000/images/",
         ""
       );
       usedFiles.push(profilePicture);
