@@ -3,6 +3,7 @@ const verifyBearerToken = require("../helper/verifyBearerToken");
 const User = require("../models/User");
 const UserProfile = require("../models/UserProfile");
 const UserSkills = require("../models/UserSkills");
+const jwt = require("jsonwebtoken");
 
 router.get("/:id", async (req, res) => {
   try {
@@ -23,6 +24,8 @@ router.put("/", verifyBearerToken, async (req, res) => {
         headLine: req.body.headLine,
         country: req.body.country,
         city: req.body.city,
+        industry: req.body.industry,
+        education: req.body.education,
         about: req.body.about,
       },
     });
@@ -38,7 +41,14 @@ router.put("/", verifyBearerToken, async (req, res) => {
     });
 
     const userUpdated = await User.findById(req.user.users._id);
-    res.status(200).json(userUpdated);
+    const { password, ...userDocs } = userUpdated._doc;
+    const token = jwt.sign({ users: userDocs }, process.env.JWT_TOKEN, {
+      expiresIn: "2h",
+    });
+    res.status(200).json({
+      token: token,
+      user: userDocs,
+    });
   } catch (error) {
     return res.status(500).json(error);
   }
@@ -75,7 +85,9 @@ router.delete(
   verifyBearerToken,
   async (req, res) => {
     try {
-      const userSkills = await UserSkills.findOne({ userId: req.user.users._id });
+      const userSkills = await UserSkills.findOne({
+        userId: req.user.users._id,
+      });
       await userSkills.updateOne({
         $pull: {
           skills: req.params.skillname,
